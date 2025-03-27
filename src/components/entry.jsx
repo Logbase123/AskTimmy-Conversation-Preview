@@ -295,6 +295,7 @@ export default function StoreConversationForm() {
             };
             
             chatWidget.messages = responseData;
+            chatWidget.storeId = storeId;
             window.scrollTo(0, 0);
         }
     }, [responseData]);
