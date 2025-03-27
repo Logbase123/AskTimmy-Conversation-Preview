@@ -7,6 +7,7 @@
   background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
   position: relative;
   overflow: hidden;
+  
 }
 
 /* Add decorative circles in the background */
@@ -59,14 +60,12 @@
   padding: 40px;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 480px;
+  min-width: 380px;
   position: relative;
   z-index: 1;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  margin-top: 40px;
-  margin-bottom: 20px;
+  margin: 20px 20px 20px 20px;
 }
 
 .form-container h2 {
@@ -308,14 +307,34 @@
   max-width: 60px;
   background: #8f4bd7;
   border-radius: 8px;
-  border-color: #8f4bd7;
+  border: none;
+  outline: none;
   cursor: pointer;
-  gap:6px;
-  }
-  
-  .back-button-text {
-    color: #e4e8ec;
-  }
+  gap: 6px;
+  padding: 4px 8px;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.back-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.back-button:hover {
+  background: #7a3bc2;
+}
+
+.back-arrow {
+  width: 9px;
+  height: 14px;
+  filter: brightness(0) invert(1);
+}
+
+.back-button-text {
+  color: #e4e8ec;
+  font-size: 14px;
+}
 
 .loading-container {
     display: flex;
