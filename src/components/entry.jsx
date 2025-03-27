@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import "./StoreConversationForm.css";
+import { leftArrow } from "./assets";
 
 export default function StoreConversationForm() {
     const [conversationId, setConversationId] = useState("");
@@ -311,11 +312,10 @@ export default function StoreConversationForm() {
                 <div className="form">
                     <div className="pattern-overlay"></div>
                     <div className="header-section">
-                        <h1>AskTimmy.ai-Conversation Preview</h1>
+                        <h1>AskTimmy.ai<br />Conversation preview</h1>
                         <p>View and analyze your conversation details</p>
                     </div>
                     <div className="form-container">
-                        <h2>Enter Details</h2>
                         <form className="form-content">
                             <div className="form-group">
                                 <label>Store ID</label>
@@ -323,7 +323,7 @@ export default function StoreConversationForm() {
                                     type="text"
                                     value={storeId}
                                     onChange={(e) => setStoreId(e.target.value)}
-                                    placeholder="Enter your Store ID"
+                                    placeholder="Enter your store ID"
                                     required
                                     className="form-input"
                                 />
@@ -334,7 +334,7 @@ export default function StoreConversationForm() {
                                     type="text"
                                     value={conversationId}
                                     onChange={(e) => setConversationId(e.target.value)}
-                                    placeholder="Enter your Conversation ID"
+                                    placeholder="Enter your conversation ID"
                                     required
                                     className="form-input"
                                 />
@@ -373,7 +373,7 @@ export default function StoreConversationForm() {
                     <div className="content-wrapper">
                         <div className="back-button">
                             <button onClick={handleBack} className="back-button">
-                                <span className="back-button-text">←</span>
+                                <img src={leftArrow} alt="Back" className="back-arrow" />
                                 <span className="back-button-text">Back</span>
                             </button>
                         </div>
