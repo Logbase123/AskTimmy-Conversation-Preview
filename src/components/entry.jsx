@@ -44,7 +44,7 @@ export default function StoreConversationForm() {
                     setShowForm(false);
                 } catch (error) {
                     console.error('Error:', error);
-                    alert("Error: " + error);
+                    alert("Invalid conversation ID or store ID");
                     navigate('/');
                     setShowForm(true);
                 } finally {
