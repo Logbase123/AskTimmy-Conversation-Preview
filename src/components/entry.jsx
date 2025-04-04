@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import "./StoreConversationForm.css";
-import { leftArrow } from "./assets";
+import { leftArrow, copy, checkCircle } from "./assets";
 
 export default function StoreConversationForm() {
     const [conversationId, setConversationId] = useState("");
@@ -11,6 +11,8 @@ export default function StoreConversationForm() {
     const [isLoading, setIsLoading] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
+    const [isCopiedId, setIsCopiedId] = useState(false);
+    const [isCopiedStoreId, setIsCopiedStoreId] = useState(false);
     const handleBack = () => {
         navigate('/');
         setConversationId("");
@@ -373,11 +375,55 @@ export default function StoreConversationForm() {
                     </div>
                     <div className="content-wrapper">
                         <div className="back-button">
-                            <button onClick={handleBack} className="back-button">
+                            <button onClick={() => {
+                                handleBack();
+                                setIsCopiedId(false);
+                                setIsCopiedStoreId(false);
+                            }} className="back-button">
                                 <img src={leftArrow} alt="Back" className="back-arrow" />
                                 <span className="back-button-text">Back</span>
                             </button>
                         </div>
+                        
+                        <div className="id-display-container-wrapper">
+                            <div className="id-display-container">
+                                <div className="id-display-row">
+                                    <span className="id-label">Conversation ID:</span>
+                                <span className="id-value">{conversationId}</span>
+                                <button className="copy-button" onClick={() => {
+                                        navigator.clipboard.writeText(conversationId);
+                                        setIsCopiedId(true);
+                                        setTimeout(() => {
+                                            setIsCopiedId(false);
+                                        }, 2000);
+                                }}>
+                                    <img src={isCopiedId ? checkCircle : copy} alt="Copy" className="copy-icon" />
+                                </button>
+                            </div>
+                            <div className="id-display-row">
+                                <span className="id-label">Store ID:</span>
+                                <span className="id-value">
+                                    <a 
+                                        href={`https://${storeId}`} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                    >
+                                        {storeId}
+                                    </a>
+                                    </span>
+                                    <button className="copy-button" onClick={() => {
+                                        navigator.clipboard.writeText(storeId);
+                                        setIsCopiedStoreId(true);
+                                        setTimeout(() => {
+                                            setIsCopiedStoreId(false);
+                                        }, 2000);
+                                    }}>
+                                        <img src={isCopiedStoreId ? checkCircle : copy} alt="Copy" className="copy-icon" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div className="chat-history">
                             <chat-widget class="chat-widget-container"></chat-widget>
                         </div>
