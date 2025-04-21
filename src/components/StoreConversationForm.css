@@ -177,9 +177,9 @@
   display: none !important;
 }
 
-.chat-history .askTimmy-current-page-info {
+/* .chat-history .askTimmy-current-page-info {
   display: none !important;
-}
+} */
 
 .chat-history conversation-stater,
 .chat-history .askTimmy-chat-assistant-info,
