@@ -1009,7 +1009,7 @@ const scrollChatToTop = () => {
                                 gap: 8,
                                 flexWrap: 'wrap'
                             }}>
-                                <div className="id-display-container"
+                                <div className="id-display-container2"
                                     style={{
                                         margin: '0 auto',
                                         minWidth: 320,
@@ -1045,7 +1045,7 @@ const scrollChatToTop = () => {
                                     </div>
                                 </div>
                                 {/* New: Conversation Stats Container */}
-                                <div className="id-display-container"
+                                <div className="id-display-container2"
                                     style={{
                                         minWidth: 320,
                                         maxWidth: 400,
