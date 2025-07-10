@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import "./StoreConversationForm.css";
 import { leftArrow, copy, checkCircle } from "./assets";
@@ -599,7 +599,7 @@ const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
         setIsLoading(true);
         try {
             const response = await fetch(
-                `https://chateasy-test.logbase.io/aichathistory?storeId=${storeId}&startDate=${startDate}&endDate=${endDate}`
+                `https://chateasy-test.logbase.io/api/conversation?storeId=${storeId}&startDate=${startEpoch}&endDate=${endEpoch}`
             );
             if (!response.ok) {
                 throw new Error('Failed to fetch');
