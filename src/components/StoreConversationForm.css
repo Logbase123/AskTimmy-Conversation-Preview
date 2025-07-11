@@ -388,6 +388,17 @@
   flex-direction: row;
   gap: 24px;
 }
+.id-display-container2 {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 16px 24px;
+  border-radius: 12px;
+  margin: 20px auto;
+  width: min(90vw, 800px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
 
 .id-display-row {
   display: flex;
