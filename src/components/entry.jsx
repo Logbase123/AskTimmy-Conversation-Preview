@@ -977,7 +977,7 @@ const scrollChatToTop = () => {
                                         
                                         disabled={currentHistoryIndex === 0}
                                     >
-                                        <img src={leftArrow} alt="Previous Conversation" style={{ width: 22, height: 22 }} />
+                                        <img src={leftArrow} alt="Previous Conversation" style={{ width: 22, height: 22 ,filter: 'grayscale(100%) brightness(0)'}} />
                                     </button>
                                     <span style={{ alignSelf: 'center', minWidth: 50, textAlign: 'center', fontWeight: 500 }}>
                                         {history.length > 0 ? `${currentHistoryIndex + 1} / ${history.length}` : '0 / 0'}
@@ -995,7 +995,7 @@ const scrollChatToTop = () => {
                                         
                                         disabled={currentHistoryIndex === history.length - 1}
                                     >
-                                        <img src={leftArrow} alt="Next Conversation" style={{width: 22, height: 22,transform: 'rotate(180deg)', }} />
+                                        <img src={leftArrow } alt="Next Conversation" style={{width: 22, height: 22,transform: 'rotate(180deg)',filter: 'grayscale(100%) brightness(0)'}} />
                                     </button>
                                 </div>
                             )}
