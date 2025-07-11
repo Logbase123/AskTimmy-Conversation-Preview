@@ -331,7 +331,7 @@ const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
             setIsLoading(false);
         }
         window.scrollTo(0, 0);
-    }, [searchParams]);
+    }, [searchParams,navigate]);
 
     useEffect(() => {
         const chatWidget = document.querySelector('chat-widget');
@@ -570,7 +570,7 @@ const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
             chatWidget.storeId = storeId;
             window.scrollTo(0, 0);
         }
-    }, [responseData]);
+    }, [responseData,storeId]);
 
     useEffect(() => {
         if (activeTab === 'date' && history.length > 0) {
@@ -599,7 +599,7 @@ const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
         setIsLoading(true);
         try {
             const response = await fetch(
-                `https://chateasy-test.logbase.io/api/conversation?storeId=${storeId}&startDate=${startEpoch}&endDate=${endEpoch}`
+                `https://chateasy-test.logbase.io/api/conversation?storeId=${storeId}&startDate=${startEpoch}&endDate=${endEpoch}&limit=500`
             );
             if (!response.ok) {
                 throw new Error('Failed to fetch');
