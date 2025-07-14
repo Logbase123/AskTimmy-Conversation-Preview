@@ -813,7 +813,7 @@ const isSubscribed = responseData?.isSubscribed;
                 </div>
             )}
             
-            {responseData && !showForm && !isLoading && (
+            {responseData && !showForm && !isLoading && activeTab === 'conversation' && (
                 <div className="chat-page">
                     <div className="background-design">
                         <div className="circle circle-1"></div>
