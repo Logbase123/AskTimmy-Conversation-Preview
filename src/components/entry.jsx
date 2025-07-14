@@ -608,6 +608,10 @@ const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
             setHistory(Array.isArray(data.items) ? data.items : []);
             setCurrentHistoryIndex(0);
             setShowForm(false);
+            setResponseData({
+                isSubscribed: data.isSubscribed,
+                isUninstalled: data.isUninstalled
+            });
         } catch (err) {
             console.error('Failed to fetch chat history');
         } finally {
@@ -680,6 +684,9 @@ const scrollChatToTop = () => {
 
   requestAnimationFrame(tryScroll);
 };
+
+const isUninstalled = responseData?.isUninstalled;
+const isSubscribed = responseData?.isSubscribed;
     
     return (
         <div>
@@ -806,7 +813,7 @@ const scrollChatToTop = () => {
                 </div>
             )}
             
-            {responseData && !showForm && !isLoading && (
+            {responseData && !showForm && !isLoading && activeTab === 'conversation' && (
                 <div className="chat-page">
                     <div className="background-design">
                         <div className="circle circle-1"></div>
@@ -1042,6 +1049,19 @@ const scrollChatToTop = () => {
                                     <div className="id-display-row">
                                         <span className="id-label">End Date:</span>
                                         <span >{formatDate(dateRange[0].endDate.getTime())}</span>
+                                    </div>
+                                    <div className="id-display-row">
+                                        <span className="id-label">Uninstalled:</span>
+                                        <span style={{ color: isUninstalled ? 'red' : 'green', fontWeight: 600 }}>
+                                            {isUninstalled ? 'Yes' : 'No'}
+                                        </span>
+                                    </div>
+
+                                    <div className="id-display-row">
+                                        <span className="id-label">Subscribed:</span>
+                                        <span style={{ color: isSubscribed ? 'green' : 'red', fontWeight: 600 }}>
+                                            {isSubscribed ? 'Yes' : 'No'}
+                                        </span>
                                     </div>
                                 </div>
                                 {/* New: Conversation Stats Container */}
