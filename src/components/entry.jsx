@@ -641,9 +641,9 @@ const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
       }))
     );
 
-    console.log("history:", history);
-    console.log("currentConversation:", currentConversation);
-    console.log("allMessages:", allMessages);
+    // console.log("history:", history);
+    // console.log("currentConversation:", currentConversation);
+    // console.log("allMessages:", allMessages);
 
     useEffect(() => {
   const handleKeyDown = (e) => {
@@ -1051,18 +1051,17 @@ const isSubscribed = responseData?.isSubscribed;
                                         <span >{formatDate(dateRange[0].endDate.getTime())}</span>
                                     </div>
                                     <div className="id-display-row">
-                                        <span className="id-label">Uninstalled:</span>
-                                        <span style={{ color: isUninstalled ? 'red' : 'green', fontWeight: 600 }}>
-                                            {isUninstalled ? 'Yes' : 'No'}
-                                        </span>
-                                    </div>
-
-                                    <div className="id-display-row">
                                         <span className="id-label">Subscribed:</span>
                                         <span style={{ color: isSubscribed ? 'green' : 'red', fontWeight: 600 }}>
                                             {isSubscribed ? 'Yes' : 'No'}
                                         </span>
                                     </div>
+                                    <div className="id-display-row">
+                                        <span className="id-label">Uninstalled:</span>
+                                        <span style={{ color: isUninstalled ? 'red' : 'green', fontWeight: 600 }}>
+                                            {isUninstalled ? 'Yes' : 'No'}
+                                        </span>
+                                    </div> 
                                 </div>
                                 {/* New: Conversation Stats Container */}
                                 <div className="id-display-container2"
