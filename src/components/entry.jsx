@@ -832,49 +832,131 @@ const isSubscribed = responseData?.isSubscribed;
                                 <span className="back-button-text">Back</span>
                             </button>
                         </div>
-                        <div className="id-display-container-wrapper">
-                            <div className="id-display-container">
-                                <div className="id-display-row">
-                                    <span className="id-label">Conversation ID:</span>
-                                    <span className="id-value">{conversationId}</span>
-                                    <button className="copy-button" onClick={() => {
-                                        navigator.clipboard.writeText(conversationId);
-                                        setIsCopiedId(true);
-                                        setTimeout(() => {
-                                            setIsCopiedId(false);
-                                        }, 2000);
-                                    }}>
-                                        <img src={isCopiedId ? checkCircle : copy} alt="Copy" className="copy-icon" />
-                                    </button>
+                        <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 24, marginTop: 40, flexWrap: 'wrap' }}>
+                            {/* Left: Chat history */}
+                            <div style={{
+                                flex: 2,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'flex-end',
+                                flexWrap: 'wrap'
+                            }}>
+                                <div
+                                    className="chat-history"
+                                    ref={chatHistoryRef}
+                                    style={{
+                                        margin: '0 auto',
+                                        background: '#fff',
+                                        borderRadius: 16,
+                                        boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                                        maxWidth: 900,
+                                        width: '100%',
+                                        padding: 0,
+                                        minHeight: 300,
+                                        overflowY: 'auto',
+                                        overflowX: 'hidden',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'flex-start',
+                                        justifyContent: 'center',
+                                    }}
+                                >
+                                    <chat-widget className="chat-widget-container"></chat-widget>
                                 </div>
-                                <div className="id-display-row">
-                                    <span className="id-label">Store ID:</span>
-                                    <span className="id-value">
-                                        <a 
-                                            href={`https://${storeId}`} 
-                                            target="_blank" 
-                                            rel="noopener noreferrer"
-                                        >
-                                            {storeId}
-                                        </a>
-                                    </span>
-                                    <button className="copy-button" onClick={() => {
-                                        navigator.clipboard.writeText(storeId);
-                                        setIsCopiedStoreId(true);
-                                        setTimeout(() => {
-                                            setIsCopiedStoreId(false);
-                                        }, 2000);
+                            </div>
+                            {/* Right: ID display */}
+                            <div style={{
+                                flex: 1,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'flex-end',
+                                gap: 8,
+                                flexWrap: 'wrap'
+                            }}>
+                                <div className="id-display-container2"
+                                    style={{
+                                        margin: '0 auto',
+                                        minWidth: 320,
+                                        maxWidth: 400,
+                                        padding: 16,
+                                        borderRadius: 16,
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                        background: '#fff',
+                                        fontSize: 13,
+                                        gap: 8,
+                                        
                                     }}>
-                                        <img src={isCopiedStoreId ? checkCircle : copy} alt="Copy" className="copy-icon" />
-                                    </button>
+                                    <h3>Store Details</h3>    
+                                    <div className="id-display-row">
+                                        <span className="id-label">Store ID:</span>
+                                        <span >{storeId}</span>
+                                        <button className="copy-button" onClick={() => {
+                                            navigator.clipboard.writeText(storeId);
+                                            setIsCopiedStoreIdDateTab(true);
+                                            setTimeout(() => setIsCopiedStoreIdDateTab(false), 2000);
+                                        }}>
+                                            <img src={isCopiedStoreIdDateTab ? checkCircle : copy} alt="Copy" className="copy-icon" />
+                                        </button>
+                                    </div>
+                                    <div className="id-display-row">
+                                        <span className="id-label">Subscribed:</span>
+                                        <span >
+                                            {isSubscribed ? 'Yes' : 'No'}
+                                        </span>
+                                    </div>
+                                    <div className="id-display-row">
+                                        <span className="id-label">Uninstalled:</span>
+                                        <span >
+                                            {isUninstalled ? 'Yes' : 'No'}
+                                        </span>
+                                    </div> 
+                                </div>
+                                <div className="id-display-container2"
+                                    style={{
+                                        minWidth: 320,
+                                        maxWidth: 400,
+                                        padding: 16,
+                                        borderRadius: 12,
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                        background: '#fff',
+                                        fontSize: 13,
+                                        marginTop: 8,
+                                        rowGap: 8,
+                                        // alignItems: "center",
+                                        flexWrap : 'wrap'
+                                    }}>
+                                    <h3>Conversation Summary</h3>
+                                    {(() => {
+                                         const {userCount, aiCount, conversationCount } = history[currentHistoryIndex] || {};
+                                        return (
+                                            <>
+                                                <div className="id-display-row">
+                                                    <span className="id-label">Convo ID:</span>
+                                                    <span style={{wordBreak: 'break-all',flex: 1,}}>{conversationId || '-'}</span>
+                                                    <button className="copy-button" onClick={() => {
+                                                        if (conversationId) {
+                                                            navigator.clipboard.writeText(conversationId);
+                                                            setIsCopiedId(true);
+                                                            setTimeout(() => setIsCopiedId(false), 2000);
+                                                        }
+                                                    }}>
+                                                        <img src={isCopiedId ? checkCircle : copy} alt="Copy" className="copy-icon" />
+                                                    </button>
+                                                </div>
+                                                <div className="id-display-row">
+                                                    <span className="id-label">User Messages:</span> 
+                                                    <span>{userCount || 0}</span>
+                                                </div>
+                                                <div className="id-display-row"><span className="id-label">AI Replies:</span> <span>{aiCount || 0}</span></div>
+                                                <div className="id-display-row"><span className="id-label">Total Messages:</span> <span>{conversationCount || 0}</span></div>
+                                            </>
+                                        );
+                                    })()}
                                 </div>
                             </div>
                         </div>
-                        <div className="chat-history" ref={chatHistoryRef}>
-                            <chat-widget class="chat-widget-container"></chat-widget>
-                        </div>
                     </div>
-                </div>
+                </div> 
             )}
             {responseData && !showForm && !isLoading && Array.isArray(responseData) && responseData.length > 0 && activeTab === 'date' && (
                 <div className="conversation-list" style={{ margin: '24px 0' }}>
@@ -1052,13 +1134,13 @@ const isSubscribed = responseData?.isSubscribed;
                                     </div>
                                     <div className="id-display-row">
                                         <span className="id-label">Subscribed:</span>
-                                        <span style={{ color: isSubscribed ? 'green' : 'red', fontWeight: 600 }}>
+                                        <span >
                                             {isSubscribed ? 'Yes' : 'No'}
                                         </span>
                                     </div>
                                     <div className="id-display-row">
                                         <span className="id-label">Uninstalled:</span>
-                                        <span style={{ color: isUninstalled ? 'red' : 'green', fontWeight: 600 }}>
+                                        <span >
                                             {isUninstalled ? 'Yes' : 'No'}
                                         </span>
                                     </div> 
