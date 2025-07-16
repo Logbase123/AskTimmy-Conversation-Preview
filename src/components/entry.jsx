@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, data } from "react-router-dom";
 import "./StoreConversationForm.css";
 import { leftArrow, copy, checkCircle } from "./assets";
 import { DateRange } from 'react-date-range';
@@ -687,7 +687,36 @@ const scrollChatToTop = () => {
 
 const isUninstalled = responseData?.isUninstalled;
 const isSubscribed = responseData?.isSubscribed;
-    
+
+const getConversationStats = (messages = []) => {
+  let userCount = 0, aiCount = 0, total = 0;
+
+  messages.forEach(msg => {
+    if (!msg) return;
+
+    const isAI = msg.isAIReply === true || msg.type === 'system' || msg.sender === 'bot';
+    const isUser = !isAI;
+
+    if (isAI) aiCount++;
+    else if (isUser) userCount++;
+
+    total++;
+  });
+
+  return { userCount, aiCount, conversationCount: total };
+};
+
+  const extractMessages = (data, tab) => {
+    if (tab === 'conversation') {
+      return Array.isArray(data) ? data : [];
+    }
+    if (tab === 'date') {
+      return data?.[currentHistoryIndex]?.conversation?.flatMap(c => c.messages || []) || [];
+    }
+    return [];
+  };
+  
+
     return (
         <div>
             {showForm && !searchParams.get('id') && !searchParams.get('storeId') && (
@@ -849,7 +878,7 @@ const isSubscribed = responseData?.isSubscribed;
                                         background: '#fff',
                                         borderRadius: 16,
                                         boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-                                        maxWidth: 900,
+                                        maxWidth: 800,
                                         width: '100%',
                                         padding: 0,
                                         minHeight: 300,
@@ -927,29 +956,36 @@ const isSubscribed = responseData?.isSubscribed;
                                     }}>
                                     <h3>Conversation Summary</h3>
                                     {(() => {
-                                         const {userCount, aiCount, conversationCount } = history[currentHistoryIndex] || {};
+                                        const flatMessages = extractMessages(responseData, activeTab);
+                                        const { userCount, aiCount, conversationCount } = getConversationStats(flatMessages);
                                         return (
-                                            <>
-                                                <div className="id-display-row">
-                                                    <span className="id-label">Convo ID:</span>
-                                                    <span style={{wordBreak: 'break-all',flex: 1,}}>{conversationId || '-'}</span>
-                                                    <button className="copy-button" onClick={() => {
-                                                        if (conversationId) {
-                                                            navigator.clipboard.writeText(conversationId);
-                                                            setIsCopiedId(true);
-                                                            setTimeout(() => setIsCopiedId(false), 2000);
-                                                        }
-                                                    }}>
-                                                        <img src={isCopiedId ? checkCircle : copy} alt="Copy" className="copy-icon" />
-                                                    </button>
-                                                </div>
-                                                <div className="id-display-row">
-                                                    <span className="id-label">User Messages:</span> 
-                                                    <span>{userCount || 0}</span>
-                                                </div>
-                                                <div className="id-display-row"><span className="id-label">AI Replies:</span> <span>{aiCount || 0}</span></div>
-                                                <div className="id-display-row"><span className="id-label">Total Messages:</span> <span>{conversationCount || 0}</span></div>
-                                            </>
+                                        <>
+                                            <div className="id-display-row">
+                                            <span className="id-label">Convo ID:</span>
+                                            <span style={{ wordBreak: 'break-all', flex: 1 }}>{conversationId || '-'}</span>
+                                            <button className="copy-button" onClick={() => {
+                                                if (conversationId) {
+                                                navigator.clipboard.writeText(conversationId);
+                                                setIsCopiedId(true);
+                                                setTimeout(() => setIsCopiedId(false), 2000);
+                                                }
+                                            }}>
+                                                <img src={isCopiedId ? checkCircle : copy} alt="Copy" className="copy-icon" />
+                                            </button>
+                                            </div>
+                                            <div className="id-display-row">
+                                                <span className="id-label">User Messages:</span> 
+                                                <span>{userCount || 0}</span>
+                                            </div>
+                                            <div className="id-display-row">
+                                                <span className="id-label">AI Replies:</span> 
+                                                <span>{aiCount || 0}</span>
+                                            </div>
+                                            <div className="id-display-row">
+                                                <span className="id-label">Total Messages:</span> 
+                                                <span>{conversationCount || 0}</span>
+                                            </div>
+                                        </>
                                         );
                                     })()}
                                 </div>
