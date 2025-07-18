@@ -312,7 +312,11 @@ const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
                     }
                     const data = await response.json();
                     console.log('Data:', data);
-                    setResponseData(data.conversation);
+                    setResponseData({
+                        conversation: data.conversation,
+                        isSubscribed: data.isSubscribed,
+                        isUninstalled: data.isUninstalled
+                    });
                     setShowForm(false);
                 } catch (error) {
                     console.error('Error:', error);
@@ -566,7 +570,7 @@ const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
                 "moneyWithCurrencyInEmailsFormat": "${{amount}} USD"
             };
             
-            chatWidget.messages = responseData;
+            chatWidget.messages = responseData.conversation;
             chatWidget.storeId = storeId;
             window.scrollTo(0, 0);
         }
@@ -878,7 +882,7 @@ const getConversationStats = (messages = []) => {
                                         background: '#fff',
                                         borderRadius: 16,
                                         boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-                                        maxWidth: 800,
+                                        maxWidth: 900,
                                         width: '100%',
                                         padding: 0,
                                         minHeight: 300,
@@ -952,7 +956,7 @@ const getConversationStats = (messages = []) => {
                                         marginTop: 8,
                                         rowGap: 8,
                                         // alignItems: "center",
-                                        flexWrap : 'wrap'
+                                        // flexWrap : 'wrap'
                                     }}>
                                     <h3>Conversation Summary</h3>
                                     {(() => {
@@ -1076,6 +1080,7 @@ const getConversationStats = (messages = []) => {
                                         overflowX: 'hidden',
                                         display: 'flex',
                                         flexDirection: 'column',
+                                        // flexwrap:'wrap',
                                         alignItems: 'flex-start',
                                         justifyContent: 'center',
                                     }}
@@ -1194,7 +1199,7 @@ const getConversationStats = (messages = []) => {
                                         marginTop: 8,
                                         rowGap: 8,
                                         // alignItems: "center",
-                                        flexWrap : 'wrap'
+                                        // flexWrap : 'wrap'
                                     }}>
                                     <h3>Conversation Summary</h3>
                                     {(() => {
@@ -1232,3 +1237,8 @@ const getConversationStats = (messages = []) => {
         </div>
     );
 }
+// import StoreConversationForm from './StoreConversationForm';
+
+// export default function App() {
+//   return <StoreConversationForm />;
+// }
