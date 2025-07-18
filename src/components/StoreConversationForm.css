@@ -197,6 +197,7 @@
   overflow-y: auto;
   border: 1px solid #ccc;
   border-radius: 16px;
+  flex-wrap: wrap;
 }
 
 
@@ -277,6 +278,7 @@
 }
 
 .content-wrapper {
+  flex-wrap: wrap;
   display: flex;
   flex-direction: column;
   position: relative;
