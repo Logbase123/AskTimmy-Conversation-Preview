@@ -315,7 +315,10 @@ const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
                     setResponseData({
                         conversation: data.conversation,
                         isSubscribed: data.isSubscribed,
-                        isUninstalled: data.isUninstalled
+                        isUninstalled: data.isUninstalled,
+                        aiCount: data.aiCount,
+                        userCount: data.userCount,
+                        conversationCount: data.conversationCount
                     });
                     setShowForm(false);
                 } catch (error) {
@@ -712,7 +715,9 @@ const getConversationStats = (messages = []) => {
 
   const extractMessages = (data, tab) => {
     if (tab === 'conversation') {
-      return Array.isArray(data) ? data : [];
+    return Array.isArray(data?.conversation)
+  ? data.conversation
+  : [];
     }
     if (tab === 'date') {
       return data?.[currentHistoryIndex]?.conversation?.flatMap(c => c.messages || []) || [];
@@ -960,8 +965,8 @@ const getConversationStats = (messages = []) => {
                                     }}>
                                     <h3>Conversation Summary</h3>
                                     {(() => {
-                                        const flatMessages = extractMessages(responseData, activeTab);
-                                        const { userCount, aiCount, conversationCount } = getConversationStats(flatMessages);
+                                        const messages = extractMessages(responseData, activeTab); // already defined in your code
+                                        const { userCount, aiCount, conversationCount } = getConversationStats(messages);
                                         return (
                                         <>
                                             <div className="id-display-row">
