@@ -602,17 +602,19 @@ const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
 
     const handleDateRangeSubmit = async () => {
         const startEpoch = dateRange[0].startDate.getTime();
-        const endEpoch = dateRange[0].endDate.getTime();
+        const endEpoch = new Date(dateRange[0].endDate).setHours(23, 59, 59, 999);
+        console.log("startEpoch:", startEpoch, "endEpoch:", endEpoch);
         setIsLoading(true);
         try {
             const response = await fetch(
                 `https://chateasy-test.logbase.io/api/conversation?storeId=${storeId}&startDate=${startEpoch}&endDate=${endEpoch}&limit=500`
             );
             if (!response.ok) {
+                console.log("response:", response);
                 throw new Error('Failed to fetch');
             }
             const data = await response.json();
-            setHistory(Array.isArray(data.items) ? data.items : []);
+            setHistory(Array.isArray(data.items) ? data.items.reverse() : []);
             setCurrentHistoryIndex(0);
             setShowForm(false);
             setResponseData({
@@ -620,6 +622,7 @@ const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
                 isUninstalled: data.isUninstalled
             });
         } catch (err) {
+            console.log("err:", err);
             console.error('Failed to fetch chat history');
         } finally {
             setIsLoading(false);
