@@ -167,6 +167,8 @@
 
 .chat-history .askTimmy-chat-container {
   border-radius: 0px !important;
+  min-width: 700px;
+  /* max-width: 900px; */
 }
 
 .chat-history .askTimmy-chat-container .system>* {

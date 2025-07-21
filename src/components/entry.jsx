@@ -887,7 +887,8 @@ const getConversationStats = (messages = []) => {
                                         background: '#fff',
                                         borderRadius: 16,
                                         boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-                                        maxWidth: 900,
+                                        // maxWidth: 900,
+                                        minWidth: 700,
                                         width: '100%',
                                         padding: 0,
                                         minHeight: 300,
@@ -1077,7 +1078,8 @@ const getConversationStats = (messages = []) => {
                                         background: '#fff',
                                         borderRadius: 16,
                                         boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-                                        maxWidth: 900,
+                                        minWidth: 700,
+                                        // maxWidth: 900,
                                         width: '100%',
                                         padding: 0,
                                         minHeight: 300,
@@ -1242,8 +1244,3 @@ const getConversationStats = (messages = []) => {
         </div>
     );
 }
-// import StoreConversationForm from './StoreConversationForm';
-
-// export default function App() {
-//   return <StoreConversationForm />;
-// }
