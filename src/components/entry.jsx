@@ -601,9 +601,17 @@ const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
     };
 
     const handleDateRangeSubmit = async () => {
-        const startEpoch = dateRange[0].startDate.getTime();
-        const endEpoch = new Date(dateRange[0].endDate).setHours(23, 59, 59, 999);
-        console.log("startEpoch:", startEpoch, "endEpoch:", endEpoch);
+        // const startEpoch = dateRange[0].startDate.getTime();
+        // const endEpoch = dateRange[0].endDate.getTime();
+        const startOfDay = new Date(dateRange[0].startDate);
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const endOfDay = new Date(dateRange[0].endDate);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const startEpoch = startOfDay.getTime();
+        const endEpoch = endOfDay.getTime();
+
         setIsLoading(true);
         try {
             const response = await fetch(
@@ -831,6 +839,7 @@ const getConversationStats = (messages = []) => {
                                         moveRangeOnFirstSelection={false}
                                         ranges={dateRange}
                                         locale={enUS}
+                                        maxDate={new Date()} 
                                     />
                                 </div>
                                 <button
