@@ -618,10 +618,11 @@ const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
                 `https://chateasy-test.logbase.io/api/conversation?storeId=${storeId}&startDate=${startEpoch}&endDate=${endEpoch}&limit=500`
             );
             if (!response.ok) {
+                console.log("response:", response);
                 throw new Error('Failed to fetch');
             }
             const data = await response.json();
-            setHistory(Array.isArray(data.items) ? data.items : []);
+            setHistory(Array.isArray(data.items) ? data.items.reverse() : []);
             setCurrentHistoryIndex(0);
             setShowForm(false);
             setResponseData({
@@ -629,6 +630,7 @@ const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
                 isUninstalled: data.isUninstalled
             });
         } catch (err) {
+            console.log("err:", err);
             console.error('Failed to fetch chat history');
         } finally {
             setIsLoading(false);
