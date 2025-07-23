@@ -10,9 +10,9 @@ import { differenceInDays } from 'date-fns';
 import 'chat-widget';
 
 function formatDate(epoch) {
-  if (!epoch) return '-';
-  const d = new Date(Number(epoch));
-  return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+    if (!epoch) return '-';
+    const d = new Date(Number(epoch));
+    return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 function setupChatWidget(messages, storeId) {
@@ -242,12 +242,12 @@ function setupChatWidget(messages, storeId) {
         chatWidget.isVoiceInputEnabled = false;
         chatWidget.voiceInputLanguage = "en";
         chatWidget.isLocaleChanged = false;
-          chatWidget.shopCurrencyFormats = {
-                 "moneyFormat": "${{amount}}",
-                "moneyInEmailsFormat": "${{amount}}",
-                "moneyWithCurrencyFormat": "${{amount}} USD",
-                "moneyWithCurrencyInEmailsFormat": "${{amount}} USD"
-            };
+        chatWidget.shopCurrencyFormats = {
+            "moneyFormat": "${{amount}}",
+            "moneyInEmailsFormat": "${{amount}}",
+            "moneyWithCurrencyFormat": "${{amount}} USD",
+            "moneyWithCurrencyInEmailsFormat": "${{amount}} USD"
+        };
         window.scrollTo(0, 0);
     }
 }
@@ -272,11 +272,11 @@ export default function StoreConversationForm() {
         }
     ]);
 
-const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
+    const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
     const [isCopiedStartEpoch, setIsCopiedStartEpoch] = useState(false);
     const [isCopiedEndEpoch, setIsCopiedEndEpoch] = useState(false);
     const [history, setHistory] = useState([]);
-     const [currentHistoryIndex, setCurrentHistoryIndex] = useState(0);
+    const [currentHistoryIndex, setCurrentHistoryIndex] = useState(0);
     const chatHistoryRef = useRef(null);
 
     const handleBack = () => {
@@ -287,91 +287,66 @@ const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
         window.scrollTo(0, 0);
     };
 
-useEffect(() => {
-  const urlId = searchParams.get('id');
-  const urlStoreId = searchParams.get('storeId');
+    useEffect(() => {
+        const urlId = searchParams.get('id');
+        const urlStoreId = searchParams.get('storeId');
 
-  if (urlId && urlStoreId) {
-    setConversationId(urlId);
-    setStoreId(urlStoreId);
-    handleSubmit(urlStoreId, urlId); 
-  } else {
-    setShowForm(true);
-    setResponseData(null);
-  }
+        if (urlId && urlStoreId) {
+            setConversationId(urlId);
+            setStoreId(urlStoreId);
+            setIsLoading(true);
+            const fetchData = async () => {
+                try {
+                    const response = await fetch(
+                        `https://chateasy-test.logbase.io/api/conversation?id=${urlId}&storeId=${urlStoreId}`,
+                        {
+                            method: "GET",
+                            headers: {
+                                "Content-Type": "application/json"
+                            }
+                        }
+                    );
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('API error:', errorText);
+                        throw new Error('API error');
+                    }
+                    const data = await response.json();
+                    console.log('Data:', data);
+                    setResponseData({
+                        conversation: data.conversation,
+                        isSubscribed: data.isSubscribed,
+                        isUninstalled: data.isUninstalled,
+                        aiCount: data.aiCount,
+                        userCount: data.userCount,
+                        conversationCount: data.conversationCount
+                    });
+                    setShowForm(false);
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert("Invalid conversation ID or store ID");
+                    navigate('/');
+                    setShowForm(true);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+            fetchData();
+        } else {
+            setShowForm(true);
+            setResponseData(null);
+            setIsLoading(false);
+        }
+        window.scrollTo(0, 0);
+    }, [searchParams, navigate]);
 
-  window.scrollTo(0, 0);
-}, [searchParams]);
 
-const handleSubmit = async (store = storeId, conversation = conversationId) => {
-  if (!store || !conversation) {
-    setErrorMessage("Please enter both Store ID and Conversation ID.");
-    setShowError(true);
-    return;
-  }
-  setIsLoading(true);
-  try {
-    const response = await fetch(
-      `https://chateasy-test.logbase.io/api/conversation?id=${conversation}&storeId=${store}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    const text = await response.text();
-
-    if (!response.ok) {
-      if (
-        text.includes("Invalid storeId") ||
-        text.includes("Invalid storeId or id")
-      ) {
-        setErrorMessage("Invalid Store ID or Conversation ID. Please try again.");
-      } else {
-        setErrorMessage("Something went wrong. Please try again.");
-      }
-      setShowError(true);
-      setShowForm(true);
-      setResponseData(null);
-      return;
-    }
-
-    const data = JSON.parse(text);
-
-    if (!data || !data.conversation) {
-      setErrorMessage("No conversation data found for this ID.");
-      setShowError(true);
-      setShowForm(true);
-      setResponseData(null);
-      return;
-    }
-
-    //  Valid response
-    setResponseData({
-      conversation: data.conversation,
-      isSubscribed: data.isSubscribed,
-      isUninstalled: data.isUninstalled,
-      aiCount: data.aiCount,
-      userCount: data.userCount,
-      conversationCount: data.conversationCount,
-    });
-
-    setShowForm(false);      // Hide form only on success
-    setShowError(false);     // Clear any previous error
-    setSearchParams({ id: conversationId, storeId: storeId }); // only after success
-
-  } catch (error) {
-    console.error("Error:", error);
-    setErrorMessage("Something went wrong. Please try again.");
-    setShowError(true);
-    setShowForm(true);
-    setResponseData(null);
-  } finally {
-    setIsLoading(false);
-  }
-};
+    const handleSubmit = async () => {
+        if (conversationId && storeId) {
+            setSearchParams({ id: conversationId, storeId: storeId });
+            window.scrollTo(0, 0);
+        }
+    };
 
     useEffect(() => {
         const chatWidget = document.querySelector('chat-widget');
@@ -605,12 +580,12 @@ const handleSubmit = async (store = storeId, conversation = conversationId) => {
                 "moneyWithCurrencyFormat": "${{amount}} USD",
                 "moneyWithCurrencyInEmailsFormat": "${{amount}} USD"
             };
-            
+
             chatWidget.messages = responseData.conversation;
             chatWidget.storeId = storeId;
             window.scrollTo(0, 0);
         }
-    }, [responseData,storeId]);
+    }, [responseData, storeId]);
 
     useEffect(() => {
         if (activeTab === 'date' && history.length > 0) {
@@ -634,80 +609,80 @@ const handleSubmit = async (store = storeId, conversation = conversationId) => {
     // };
 
     const handleDateRangeSubmit = async () => {
-  const diffDays = differenceInDays(dateRange[0].endDate, dateRange[0].startDate);
+        const diffDays = differenceInDays(dateRange[0].endDate, dateRange[0].startDate);
 
-  if (!storeId) {
-    setShowError(true);
-    setErrorMessage("Enter the correct Store ID to fetch data.");
-    return;
-  }
+        if (!storeId) {
+            setShowError(true);
+            setErrorMessage("Enter the correct Store ID to fetch data.");
+            return;
+        }
 
-//   if (diffDays > 29) {
-//     alert("Please select a date range of 30 days or less.");
-//     return;
-//   }
-if (diffDays > 29) {
-  setShowError(true);
-  setErrorMessage("Please select a date range of 30 days or less.");
-  return;
-}
+        //   if (diffDays > 29) {
+        //     alert("Please select a date range of 30 days or less.");
+        //     return;
+        //   }
+        if (diffDays > 29) {
+            setShowError(true);
+            setErrorMessage("Please select a date range of 30 days or less.");
+            return;
+        }
 
 
-  setShowError(false);
-  setErrorMessage("");
-  setIsLoading(true);
+        setShowError(false);
+        setErrorMessage("");
+        setIsLoading(true);
 
-  const startOfDay = new Date(dateRange[0].startDate);
-  startOfDay.setHours(0, 0, 0, 0);
-  const endOfDay = new Date(dateRange[0].endDate);
-  endOfDay.setHours(23, 59, 59, 999);
+        const startOfDay = new Date(dateRange[0].startDate);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(dateRange[0].endDate);
+        endOfDay.setHours(23, 59, 59, 999);
 
-  const startEpoch = startOfDay.getTime();
-  const endEpoch = endOfDay.getTime();
+        const startEpoch = startOfDay.getTime();
+        const endEpoch = endOfDay.getTime();
 
-  try {
-    const response = await fetch(
-      `https://chateasy-test.logbase.io/api/conversation?storeId=${storeId}&startDate=${startEpoch}&endDate=${endEpoch}&limit=500`
-    );
+        try {
+            const response = await fetch(
+                `https://chateasy-test.logbase.io/api/conversation?storeId=${storeId}&startDate=${startEpoch}&endDate=${endEpoch}&limit=500`
+            );
 
-    const text = await response.text();
+            const text = await response.text();
 
-    if (!response.ok) {
-      if (text.includes("Invalid storeId")) {
-        setShowError(true);
-        setErrorMessage("Invalid Store ID. Please enter a valid one.");
-      } else {
-        setShowError(true);
-        setErrorMessage("Unable to fetch conversations. Please check your input.");
-      }
-      setHistory([]);
-      return;
-    }
+            if (!response.ok) {
+                if (text.includes("Invalid storeId")) {
+                    setShowError(true);
+                    setErrorMessage("Invalid Store ID. Please enter a valid one.");
+                } else {
+                    setShowError(true);
+                    setErrorMessage("Unable to fetch conversations. Please check your input.");
+                }
+                setHistory([]);
+                return;
+            }
 
-    const data = JSON.parse(text);
+            const data = JSON.parse(text);
 
-    if (!data.items || data.items.length === 0) {
-      setHistory([]);
-      setShowError(true);
-      setErrorMessage("No conversations found for selected date range.");
-      return;
-    }
+            if (!data.items || data.items.length === 0) {
+                setHistory([]);
+                setShowError(true);
+                setErrorMessage("No conversations found for selected date range.");
+                return;
+            }
 
-    setHistory(data.items || []);
-    setCurrentHistoryIndex(0);
-    setShowForm(false);
-    setResponseData({
-      isSubscribed: data.isSubscribed,
-      isUninstalled: data.isUninstalled,
-    });
-  } catch (err) {
-    console.error(err);
-    setShowError(true);
-    setErrorMessage("Something went wrong. Please try again.");
-  } finally {
-    setIsLoading(false);
-  }
-};
+            setHistory(data.items || []);
+            setCurrentHistoryIndex(0);
+            setShowForm(false);
+            setResponseData({
+                isSubscribed: data.isSubscribed,
+                isUninstalled: data.isUninstalled,
+            });
+        } catch (err) {
+            console.error(err);
+            setShowError(true);
+            setErrorMessage("Something went wrong. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleDateRangeChange = (item) => {
         const start = item.selection.startDate;
@@ -722,13 +697,13 @@ if (diffDays > 29) {
 
     const currentConversation = history[currentHistoryIndex]?.conversation || [];
     const allMessages = currentConversation.flatMap(c =>
-      (c.messages || []).map(m => ({
-        text: m.message || '',
-        sender: m.isAIReply ? 'bot' : 'user',
-        cards: m.cards || [],
-        imageUrl: m.imageUrl || null,
-        // add other fields as needed
-      }))
+        (c.messages || []).map(m => ({
+            text: m.message || '',
+            sender: m.isAIReply ? 'bot' : 'user',
+            cards: m.cards || [],
+            imageUrl: m.imageUrl || null,
+            // add other fields as needed
+        }))
     );
 
     // console.log("history:", history);
@@ -736,87 +711,87 @@ if (diffDays > 29) {
     // console.log("allMessages:", allMessages);
 
     useEffect(() => {
-  const handleKeyDown = (e) => {
-    if (activeTab !== 'date' || history.length <= 1) return;
+        const handleKeyDown = (e) => {
+            if (activeTab !== 'date' || history.length <= 1) return;
 
-    if (e.key === 'ArrowLeft' && currentHistoryIndex > 0) {
-      setCurrentHistoryIndex(prev => prev - 1);
-      setTimeout(scrollChatToTop, 150);
-    }
+            if (e.key === 'ArrowLeft' && currentHistoryIndex > 0) {
+                setCurrentHistoryIndex(prev => prev - 1);
+                setTimeout(scrollChatToTop, 150);
+            }
 
-    if (e.key === 'ArrowRight' && currentHistoryIndex < history.length - 1) {
-      setCurrentHistoryIndex(prev => prev + 1);
-      setTimeout(scrollChatToTop, 150);
-    }
-  };
+            if (e.key === 'ArrowRight' && currentHistoryIndex < history.length - 1) {
+                setCurrentHistoryIndex(prev => prev + 1);
+                setTimeout(scrollChatToTop, 150);
+            }
+        };
 
-  window.addEventListener('keydown', handleKeyDown);
-  return () => window.removeEventListener('keydown', handleKeyDown);
-}, [activeTab, currentHistoryIndex, history.length]);
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [activeTab, currentHistoryIndex, history.length]);
 
-const scrollChatToTop = () => {
-  let tries = 0;
+    const scrollChatToTop = () => {
+        let tries = 0;
 
-  const tryScroll = () => {
-    const scrollable = document.querySelector('.askTimmy-chat-window');
-    if (scrollable) {
-      scrollable.scrollTo({ top: 0});
-    // Check if the scroll position is at the top
-      if (scrollable.scrollTop > 0 && tries < 10) {
-        tries++;
+        const tryScroll = () => {
+            const scrollable = document.querySelector('.askTimmy-chat-window');
+            if (scrollable) {
+                scrollable.scrollTo({ top: 0 });
+                // Check if the scroll position is at the top
+                if (scrollable.scrollTop > 0 && tries < 10) {
+                    tries++;
+                    requestAnimationFrame(tryScroll);
+                }
+            } else if (tries < 10) {
+                tries++;
+                requestAnimationFrame(tryScroll);
+            }
+        };
+
         requestAnimationFrame(tryScroll);
-      }
-    } else if (tries < 10) {
-      tries++;
-      requestAnimationFrame(tryScroll);
-    }
-  };
+    };
 
-  requestAnimationFrame(tryScroll);
-};
+    const isUninstalled = responseData?.isUninstalled;
+    const isSubscribed = responseData?.isSubscribed;
 
-const isUninstalled = responseData?.isUninstalled;
-const isSubscribed = responseData?.isSubscribed;
+    const getConversationStats = (messages = []) => {
+        let userCount = 0, aiCount = 0, total = 0;
 
-const getConversationStats = (messages = []) => {
-  let userCount = 0, aiCount = 0, total = 0;
+        messages.forEach(msg => {
+            if (!msg) return;
 
-  messages.forEach(msg => {
-    if (!msg) return;
+            const isAI = msg.isAIReply === true || msg.type === 'system' || msg.sender === 'bot';
+            const isUser = !isAI;
 
-    const isAI = msg.isAIReply === true || msg.type === 'system' || msg.sender === 'bot';
-    const isUser = !isAI;
+            if (isAI) aiCount++;
+            else if (isUser) userCount++;
 
-    if (isAI) aiCount++;
-    else if (isUser) userCount++;
+            total++;
+        });
 
-    total++;
-  });
+        return { userCount, aiCount, conversationCount: total };
+    };
 
-  return { userCount, aiCount, conversationCount: total };
-};
+    const extractMessages = (data, tab) => {
+        if (tab === 'conversation') {
+            return Array.isArray(data?.conversation)
+                ? data.conversation
+                : [];
+        }
+        if (tab === 'date') {
+            return data?.[currentHistoryIndex]?.conversation?.flatMap(c => c.messages || []) || [];
+        }
+        return [];
+    };
 
-  const extractMessages = (data, tab) => {
-    if (tab === 'conversation') {
-    return Array.isArray(data?.conversation)
-  ? data.conversation
-  : [];
-    }
-    if (tab === 'date') {
-      return data?.[currentHistoryIndex]?.conversation?.flatMap(c => c.messages || []) || [];
-    }
-    return [];
-  };
-  
-  useEffect(() => {
-  if (showError) {
-    const timer = setTimeout(() => {
-      setShowError(false);
-      setErrorMessage('');
-    }, 5000);
-    return () => clearTimeout(timer);
-  }
-}, [showError]);
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => {
+                setShowError(false);
+                setErrorMessage('');
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
 
     return (
@@ -865,7 +840,7 @@ const getConversationStats = (messages = []) => {
                         {activeTab === 'conversation' && (
                             <form className="form-content">
                                 {showError && (
-                                <div style={{ color: 'red', marginBottom: 10 }}>{errorMessage}</div>
+                                    <div style={{ color: 'red', marginBottom: 10 }}>{errorMessage}</div>
                                 )}
                                 <div className="form-group">
                                     <label>Store ID</label>
@@ -889,26 +864,26 @@ const getConversationStats = (messages = []) => {
                                         className="form-input"
                                     />
                                 </div>
-                            <button
-                                type="button"
-                                className="submit-button"
-                                disabled={!conversationId || !storeId || isLoading}
-                                onClick={async () => {
-                                    const success = await handleSubmit(); // 👈 awaits validation + API
-                                    if (success) {
-                                    setSearchParams({ id: conversationId, storeId: storeId }); // 👈 only when valid
-                                    }
-                                }}
-                            >
-                                {isLoading ? 'Loading...' : 'View Conversation'}
-                            </button>
+                                <button
+                                    type="button"
+                                    className="submit-button"
+                                    disabled={!conversationId || !storeId || isLoading}
+                                    onClick={async () => {
+                                        const success = await handleSubmit(); // 👈 awaits validation + API
+                                        if (success) {
+                                            setSearchParams({ id: conversationId, storeId: storeId }); // 👈 only when valid
+                                        }
+                                    }}
+                                >
+                                    {isLoading ? 'Loading...' : 'View Conversation'}
+                                </button>
                             </form>
                         )}
 
                         {activeTab === 'date' && (
                             <form className="form-content">
                                 {showError && (
-                                <div style={{ color: 'red', marginBottom: 10 }}>{errorMessage}</div>
+                                    <div style={{ color: 'red', marginBottom: 10 }}>{errorMessage}</div>
                                 )}
                                 <div className="form-group">
                                     <label>Store ID</label>
@@ -929,7 +904,7 @@ const getConversationStats = (messages = []) => {
                                         moveRangeOnFirstSelection={false}
                                         ranges={dateRange}
                                         locale={enUS}
-                                        maxDate={new Date()} 
+                                        maxDate={new Date()}
                                     />
                                 </div>
                                 <button
@@ -945,14 +920,14 @@ const getConversationStats = (messages = []) => {
                     </div>
                 </div>
             )}
-            
+
             {isLoading && (
                 <div className="loading-container">
                     <div className="loading-spinner"></div>
                     <p>Loading conversation...</p>
                 </div>
             )}
-            
+
             {responseData && !showForm && !isLoading && activeTab === 'conversation' && (
                 <div className="chat-page">
                     <div className="background-design">
@@ -1025,9 +1000,9 @@ const getConversationStats = (messages = []) => {
                                         background: '#fff',
                                         fontSize: 13,
                                         gap: 8,
-                                        
+
                                     }}>
-                                    <h3>Store Details</h3>    
+                                    <h3>Store Details</h3>
                                     <div className="id-display-row">
                                         <span className="id-label">Store ID:</span>
                                         <span >{storeId}</span>
@@ -1050,7 +1025,7 @@ const getConversationStats = (messages = []) => {
                                         <span >
                                             {isUninstalled ? 'Yes' : 'No'}
                                         </span>
-                                    </div> 
+                                    </div>
                                 </div>
                                 <div className="id-display-container2"
                                     style={{
@@ -1071,40 +1046,40 @@ const getConversationStats = (messages = []) => {
                                         const messages = extractMessages(responseData, activeTab); // already defined in your code
                                         const { userCount, aiCount, conversationCount } = getConversationStats(messages);
                                         return (
-                                        <>
-                                            <div className="id-display-row">
-                                            <span className="id-label">Convo ID:</span>
-                                            <span style={{ wordBreak: 'break-all', flex: 1 }}>{conversationId || '-'}</span>
-                                            <button className="copy-button" onClick={() => {
-                                                if (conversationId) {
-                                                navigator.clipboard.writeText(conversationId);
-                                                setIsCopiedId(true);
-                                                setTimeout(() => setIsCopiedId(false), 2000);
-                                                }
-                                            }}>
-                                                <img src={isCopiedId ? checkCircle : copy} alt="Copy" className="copy-icon" />
-                                            </button>
-                                            </div>
-                                            <div className="id-display-row">
-                                                <span className="id-label">User Messages:</span> 
-                                                <span>{userCount || 0}</span>
-                                            </div>
-                                            <div className="id-display-row">
-                                                <span className="id-label">AI Replies:</span> 
-                                                <span>{aiCount || 0}</span>
-                                            </div>
-                                            <div className="id-display-row">
-                                                <span className="id-label">Total Messages:</span> 
-                                                <span>{conversationCount || 0}</span>
-                                            </div>
-                                        </>
+                                            <>
+                                                <div className="id-display-row">
+                                                    <span className="id-label">Convo ID:</span>
+                                                    <span style={{ wordBreak: 'break-all', flex: 1 }}>{conversationId || '-'}</span>
+                                                    <button className="copy-button" onClick={() => {
+                                                        if (conversationId) {
+                                                            navigator.clipboard.writeText(conversationId);
+                                                            setIsCopiedId(true);
+                                                            setTimeout(() => setIsCopiedId(false), 2000);
+                                                        }
+                                                    }}>
+                                                        <img src={isCopiedId ? checkCircle : copy} alt="Copy" className="copy-icon" />
+                                                    </button>
+                                                </div>
+                                                <div className="id-display-row">
+                                                    <span className="id-label">User Messages:</span>
+                                                    <span>{userCount || 0}</span>
+                                                </div>
+                                                <div className="id-display-row">
+                                                    <span className="id-label">AI Replies:</span>
+                                                    <span>{aiCount || 0}</span>
+                                                </div>
+                                                <div className="id-display-row">
+                                                    <span className="id-label">Total Messages:</span>
+                                                    <span>{conversationCount || 0}</span>
+                                                </div>
+                                            </>
                                         );
                                     })()}
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div> 
+                </div>
             )}
             {responseData && !showForm && !isLoading && Array.isArray(responseData) && responseData.length > 0 && activeTab === 'date' && (
                 <div className="conversation-list" style={{ margin: '24px 0' }}>
@@ -1160,7 +1135,7 @@ const getConversationStats = (messages = []) => {
                                 <img src={leftArrow} alt="Back" className="back-arrow" />
                                 <span className="back-button-text">Back</span>
                             </button>
-                            
+
                         </div>
                         <div style={{ width: '100%', display: 'flex', flexDirection: 'columns', alignItems: 'flex-start', gap: 24, marginTop: 40, flexWrap: 'wrap' }}>
                             {/* Left: Navigation buttons above chat history */}
@@ -1172,7 +1147,7 @@ const getConversationStats = (messages = []) => {
                                 flexWrap: 'wrap'
                             }}>
                                 <div
-                                    
+
                                     className="chat-history"
                                     ref={chatHistoryRef}
                                     style={{
@@ -1202,42 +1177,42 @@ const getConversationStats = (messages = []) => {
                                     )}
                                 </div>
                                 {history.length > 1 && (
-                                <div style={{ display: 'flex', gap: 4, margin: '16px auto 0 auto', justifyContent: 'center', alignItems: 'center', flexWrap: 'nowrap' }}>
-                                    <button
-                                        className="left-arrow-button"
-                                        style={{ background: 'none', border: 'none', cursor: currentHistoryIndex === 0 ? 'not-allowed' : 'pointer', padding: 4, opacity: currentHistoryIndex === 0 ? 0.5 : 1 }}
-                                    
-                                        onClick={() => { 
-                                            if (currentHistoryIndex > 0) {
-                                                setCurrentHistoryIndex(prev => prev - 1);
-                                                 setTimeout(scrollChatToTop, 150);
-                                            }
-                                        }}
-                                        
-                                        disabled={currentHistoryIndex === 0}
-                                    >
-                                        <img src={leftArrow} alt="Previous Conversation" style={{ width: 22, height: 22 ,filter: 'grayscale(100%) brightness(0)'}} />
-                                    </button>
-                                    <span style={{ alignSelf: 'center', minWidth: 50, textAlign: 'center', fontWeight: 500 }}>
-                                        {history.length > 0 ? `${currentHistoryIndex + 1} / ${history.length}` : '0 / 0'}
-                                    </span>
-                                    <button
-                                        className="right-arrow-button"
-                                        style={{ background: 'none', border: 'none', cursor: currentHistoryIndex === history.length - 1 ? 'not-allowed' : 'pointer', padding: 4, opacity: currentHistoryIndex === history.length - 1 ? 0.5 : 1 }}
-                                        
-                                        onClick={() => {
-                                            if (currentHistoryIndex < history.length - 1) {
-                                                setCurrentHistoryIndex(prev => prev + 1);
-                                                 setTimeout(scrollChatToTop, 150);
-                                            }
-                                        }}
-                                        
-                                        disabled={currentHistoryIndex === history.length - 1}
-                                    >
-                                        <img src={leftArrow } alt="Next Conversation" style={{width: 22, height: 22,transform: 'rotate(180deg)',filter: 'grayscale(100%) brightness(0)'}} />
-                                    </button>
-                                </div>
-                            )}
+                                    <div style={{ display: 'flex', gap: 4, margin: '16px auto 0 auto', justifyContent: 'center', alignItems: 'center', flexWrap: 'nowrap' }}>
+                                        <button
+                                            className="left-arrow-button"
+                                            style={{ background: 'none', border: 'none', cursor: currentHistoryIndex === 0 ? 'not-allowed' : 'pointer', padding: 4, opacity: currentHistoryIndex === 0 ? 0.5 : 1 }}
+
+                                            onClick={() => {
+                                                if (currentHistoryIndex > 0) {
+                                                    setCurrentHistoryIndex(prev => prev - 1);
+                                                    setTimeout(scrollChatToTop, 150);
+                                                }
+                                            }}
+
+                                            disabled={currentHistoryIndex === 0}
+                                        >
+                                            <img src={leftArrow} alt="Previous Conversation" style={{ width: 22, height: 22, filter: 'grayscale(100%) brightness(0)' }} />
+                                        </button>
+                                        <span style={{ alignSelf: 'center', minWidth: 50, textAlign: 'center', fontWeight: 500 }}>
+                                            {history.length > 0 ? `${currentHistoryIndex + 1} / ${history.length}` : '0 / 0'}
+                                        </span>
+                                        <button
+                                            className="right-arrow-button"
+                                            style={{ background: 'none', border: 'none', cursor: currentHistoryIndex === history.length - 1 ? 'not-allowed' : 'pointer', padding: 4, opacity: currentHistoryIndex === history.length - 1 ? 0.5 : 1 }}
+
+                                            onClick={() => {
+                                                if (currentHistoryIndex < history.length - 1) {
+                                                    setCurrentHistoryIndex(prev => prev + 1);
+                                                    setTimeout(scrollChatToTop, 150);
+                                                }
+                                            }}
+
+                                            disabled={currentHistoryIndex === history.length - 1}
+                                        >
+                                            <img src={leftArrow} alt="Next Conversation" style={{ width: 22, height: 22, transform: 'rotate(180deg)', filter: 'grayscale(100%) brightness(0)' }} />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                             {/* Right: ID display */}
                             <div style={{
@@ -1259,9 +1234,9 @@ const getConversationStats = (messages = []) => {
                                         background: '#fff',
                                         fontSize: 13,
                                         gap: 8,
-                                        
+
                                     }}>
-                                    <h3>Store Details</h3>    
+                                    <h3>Store Details</h3>
                                     <div className="id-display-row">
                                         <span className="id-label">Store ID:</span>
                                         <span >{storeId}</span>
@@ -1273,7 +1248,7 @@ const getConversationStats = (messages = []) => {
                                             <img src={isCopiedStoreIdDateTab ? checkCircle : copy} alt="Copy" className="copy-icon" />
                                         </button>
                                     </div>
-                                    
+
                                     <div className="id-display-row">
                                         <span className="id-label">Start Date:</span>
                                         <span >{formatDate(dateRange[0].startDate.getTime())}</span>
@@ -1293,7 +1268,7 @@ const getConversationStats = (messages = []) => {
                                         <span >
                                             {isUninstalled ? 'Yes' : 'No'}
                                         </span>
-                                    </div> 
+                                    </div>
                                 </div>
                                 {/* New: Conversation Stats Container */}
                                 <div className="id-display-container2"
@@ -1312,12 +1287,12 @@ const getConversationStats = (messages = []) => {
                                     }}>
                                     <h3>Conversation Summary</h3>
                                     {(() => {
-                                        const {userCount, aiCount, conversationCount } = history[currentHistoryIndex] || {};
+                                        const { userCount, aiCount, conversationCount } = history[currentHistoryIndex] || {};
                                         return (
                                             <>
                                                 <div className="id-display-row">
                                                     <span className="id-label">Convo ID:</span>
-                                                    <span style={{wordBreak: 'break-all',flex: 1,}}>{history[currentHistoryIndex]?.id || '-'}</span>
+                                                    <span style={{ wordBreak: 'break-all', flex: 1, }}>{history[currentHistoryIndex]?.id || '-'}</span>
                                                     <button className="copy-button" onClick={() => {
                                                         if (history[currentHistoryIndex]?.id) {
                                                             navigator.clipboard.writeText(history[currentHistoryIndex].id);
@@ -1329,7 +1304,7 @@ const getConversationStats = (messages = []) => {
                                                     </button>
                                                 </div>
                                                 <div className="id-display-row">
-                                                    <span className="id-label">User Messages:</span> 
+                                                    <span className="id-label">User Messages:</span>
                                                     <span>{userCount || 0}</span>
                                                 </div>
                                                 <div className="id-display-row"><span className="id-label">AI Replies:</span> <span>{aiCount || 0}</span></div>
