@@ -652,6 +652,7 @@ if (diffDays > 29) {
   return;
 }
 
+<<<<<<< HEAD
 
   setShowError(false);
   setErrorMessage("");
@@ -708,6 +709,32 @@ if (diffDays > 29) {
     setIsLoading(false);
   }
 };
+=======
+        setIsLoading(true);
+        try {
+            const response = await fetch(
+                `https://chateasy-test.logbase.io/api/conversation?storeId=${storeId}&startDate=${startEpoch}&endDate=${endEpoch}&limit=500`
+            );
+            if (!response.ok) {
+                console.log("response:", response);
+                throw new Error('Failed to fetch');
+            }
+            const data = await response.json();
+            setHistory(Array.isArray(data.items) ? data.items.reverse() : []);
+            setCurrentHistoryIndex(0);
+            setShowForm(false);
+            setResponseData({
+                isSubscribed: data.isSubscribed,
+                isUninstalled: data.isUninstalled
+            });
+        } catch (err) {
+            console.log("err:", err);
+            console.error('Failed to fetch chat history');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+>>>>>>> 88f4175f8afa809c1acb96c73bed2fa15c905dc2
 
     const handleDateRangeChange = (item) => {
         const start = item.selection.startDate;
