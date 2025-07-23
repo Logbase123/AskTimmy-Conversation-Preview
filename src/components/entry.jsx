@@ -312,7 +312,7 @@ const handleSubmit = async (store = storeId, conversation = conversationId) => {
   setIsLoading(true);
   try {
     const response = await fetch(
-      `https://chateasy-test.logbase.io/api/conversation?id=${conversationId}&storeId=${storeId}`,
+      `https://chateasy-test.logbase.io/api/conversation?id=${conversation}&storeId=${store}`,
       {
         method: "GET",
         headers: {
