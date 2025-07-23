@@ -262,6 +262,8 @@ export default function StoreConversationForm() {
     const [isCopiedId, setIsCopiedId] = useState(false);
     const [isCopiedStoreId, setIsCopiedStoreId] = useState(false);
     const [activeTab, setActiveTab] = useState('conversation');
+    const [showError, setShowError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     const [dateRange, setDateRange] = useState([
         {
             startDate: new Date(),
@@ -285,60 +287,91 @@ const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
         window.scrollTo(0, 0);
     };
 
+useEffect(() => {
+  const urlId = searchParams.get('id');
+  const urlStoreId = searchParams.get('storeId');
 
-    useEffect(() => {
-        const urlId = searchParams.get('id');
-        const urlStoreId = searchParams.get('storeId');
-        
-        if (urlId && urlStoreId) {
-            setConversationId(urlId);
-            setStoreId(urlStoreId);
-            setIsLoading(true);
-            const fetchData = async () => {
-                try {
-                    const response = await fetch(
-                        `https://chateasy-test.logbase.io/api/conversation?id=${urlId}&storeId=${urlStoreId}`,
-                        {
-                            method: "GET",
-                            headers: {
-                                "Content-Type": "application/json"
-                            }
-                        }
-                    );
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        console.error('API error:', errorText);
-                        throw new Error('API error');
-                    }
-                    const data = await response.json();
-                    console.log('Data:', data);
-                    setResponseData({
-                        conversation: data.conversation,
-                        isSubscribed: data.isSubscribed,
-                        isUninstalled: data.isUninstalled,
-                        aiCount: data.aiCount,
-                        userCount: data.userCount,
-                        conversationCount: data.conversationCount
-                    });
-                    setShowForm(false);
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert("Invalid conversation ID or store ID");
-                    navigate('/');
-                    setShowForm(true);
-                } finally {
-                    setIsLoading(false);
-                }
-            };
+  if (urlId && urlStoreId) {
+    setConversationId(urlId);
+    setStoreId(urlStoreId);
+    handleSubmit(urlStoreId, urlId); 
+  } else {
+    setShowForm(true);
+    setResponseData(null);
+  }
 
-            fetchData();
-        } else {
-            setShowForm(true);
-            setResponseData(null);
-            setIsLoading(false);
-        }
-        window.scrollTo(0, 0);
-    }, [searchParams,navigate]);
+  window.scrollTo(0, 0);
+}, [searchParams]);
+
+const handleSubmit = async (store = storeId, conversation = conversationId) => {
+  if (!store || !conversation) {
+    setErrorMessage("Please enter both Store ID and Conversation ID.");
+    setShowError(true);
+    return;
+  }
+  setIsLoading(true);
+  try {
+    const response = await fetch(
+      `https://chateasy-test.logbase.io/api/conversation?id=${conversationId}&storeId=${storeId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const text = await response.text();
+
+    if (!response.ok) {
+      if (
+        text.includes("Invalid storeId") ||
+        text.includes("Invalid storeId or id")
+      ) {
+        setErrorMessage("Invalid Store ID or Conversation ID. Please try again.");
+      } else {
+        setErrorMessage("Something went wrong. Please try again.");
+      }
+      setShowError(true);
+      setShowForm(true);
+      setResponseData(null);
+      return;
+    }
+
+    const data = JSON.parse(text);
+
+    if (!data || !data.conversation) {
+      setErrorMessage("No conversation data found for this ID.");
+      setShowError(true);
+      setShowForm(true);
+      setResponseData(null);
+      return;
+    }
+
+    //  Valid response
+    setResponseData({
+      conversation: data.conversation,
+      isSubscribed: data.isSubscribed,
+      isUninstalled: data.isUninstalled,
+      aiCount: data.aiCount,
+      userCount: data.userCount,
+      conversationCount: data.conversationCount,
+    });
+
+    setShowForm(false);      // Hide form only on success
+    setShowError(false);     // Clear any previous error
+    setSearchParams({ id: conversationId, storeId: storeId }); // only after success
+
+  } catch (error) {
+    console.error("Error:", error);
+    setErrorMessage("Something went wrong. Please try again.");
+    setShowError(true);
+    setShowForm(true);
+    setResponseData(null);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
     useEffect(() => {
         const chatWidget = document.querySelector('chat-widget');
@@ -593,49 +626,88 @@ const [isCopiedStoreIdDateTab, setIsCopiedStoreIdDateTab] = useState(false);
         }
     }, [responseData, storeId, activeTab]);
 
-    const handleSubmit = () => {
-        if (conversationId && storeId) {
-            setSearchParams({ id: conversationId, storeId: storeId });
-            window.scrollTo(0, 0);
-        }
-    };
+    // const handleSubmit = () => {
+    //     if (conversationId && storeId) {
+    //         setSearchParams({ id: conversationId, storeId: storeId });
+    //         window.scrollTo(0, 0);
+    //     }
+    // };
 
     const handleDateRangeSubmit = async () => {
-        // const startEpoch = dateRange[0].startDate.getTime();
-        // const endEpoch = dateRange[0].endDate.getTime();
-        const startOfDay = new Date(dateRange[0].startDate);
-        startOfDay.setHours(0, 0, 0, 0);
+  const diffDays = differenceInDays(dateRange[0].endDate, dateRange[0].startDate);
 
-        const endOfDay = new Date(dateRange[0].endDate);
-        endOfDay.setHours(23, 59, 59, 999);
+  if (!storeId) {
+    setShowError(true);
+    setErrorMessage("Enter the correct Store ID to fetch data.");
+    return;
+  }
 
-        const startEpoch = startOfDay.getTime();
-        const endEpoch = endOfDay.getTime();
+//   if (diffDays > 29) {
+//     alert("Please select a date range of 30 days or less.");
+//     return;
+//   }
+if (diffDays > 29) {
+  setShowError(true);
+  setErrorMessage("Please select a date range of 30 days or less.");
+  return;
+}
 
-        setIsLoading(true);
-        try {
-            const response = await fetch(
-                `https://chateasy-test.logbase.io/api/conversation?storeId=${storeId}&startDate=${startEpoch}&endDate=${endEpoch}&limit=500`
-            );
-            if (!response.ok) {
-                console.log("response:", response);
-                throw new Error('Failed to fetch');
-            }
-            const data = await response.json();
-            setHistory(Array.isArray(data.items) ? data.items.reverse() : []);
-            setCurrentHistoryIndex(0);
-            setShowForm(false);
-            setResponseData({
-                isSubscribed: data.isSubscribed,
-                isUninstalled: data.isUninstalled
-            });
-        } catch (err) {
-            console.log("err:", err);
-            console.error('Failed to fetch chat history');
-        } finally {
-            setIsLoading(false);
-        }
-    };
+
+  setShowError(false);
+  setErrorMessage("");
+  setIsLoading(true);
+
+  const startOfDay = new Date(dateRange[0].startDate);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(dateRange[0].endDate);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const startEpoch = startOfDay.getTime();
+  const endEpoch = endOfDay.getTime();
+
+  try {
+    const response = await fetch(
+      `https://chateasy-test.logbase.io/api/conversation?storeId=${storeId}&startDate=${startEpoch}&endDate=${endEpoch}&limit=500`
+    );
+
+    const text = await response.text();
+
+    if (!response.ok) {
+      if (text.includes("Invalid storeId")) {
+        setShowError(true);
+        setErrorMessage("Invalid Store ID. Please enter a valid one.");
+      } else {
+        setShowError(true);
+        setErrorMessage("Unable to fetch conversations. Please check your input.");
+      }
+      setHistory([]);
+      return;
+    }
+
+    const data = JSON.parse(text);
+
+    if (!data.items || data.items.length === 0) {
+      setHistory([]);
+      setShowError(true);
+      setErrorMessage("No conversations found for selected date range.");
+      return;
+    }
+
+    setHistory(data.items || []);
+    setCurrentHistoryIndex(0);
+    setShowForm(false);
+    setResponseData({
+      isSubscribed: data.isSubscribed,
+      isUninstalled: data.isUninstalled,
+    });
+  } catch (err) {
+    console.error(err);
+    setShowError(true);
+    setErrorMessage("Something went wrong. Please try again.");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
     const handleDateRangeChange = (item) => {
         const start = item.selection.startDate;
@@ -736,6 +808,16 @@ const getConversationStats = (messages = []) => {
     return [];
   };
   
+  useEffect(() => {
+  if (showError) {
+    const timer = setTimeout(() => {
+      setShowError(false);
+      setErrorMessage('');
+    }, 5000);
+    return () => clearTimeout(timer);
+  }
+}, [showError]);
+
 
     return (
         <div>
@@ -782,6 +864,9 @@ const getConversationStats = (messages = []) => {
 
                         {activeTab === 'conversation' && (
                             <form className="form-content">
+                                {showError && (
+                                <div style={{ color: 'red', marginBottom: 10 }}>{errorMessage}</div>
+                                )}
                                 <div className="form-group">
                                     <label>Store ID</label>
                                     <input
@@ -804,22 +889,27 @@ const getConversationStats = (messages = []) => {
                                         className="form-input"
                                     />
                                 </div>
-                                <button 
-                                    type="button" 
-                                    className="submit-button" 
-                                    disabled={!conversationId || !storeId || isLoading}
-                                    onClick={() => {
-                                        handleSubmit(); 
-                                        setSearchParams({ id: conversationId, storeId: storeId });
-                                    }}
-                                >
-                                    {isLoading ? 'Loading...' : 'View Conversation'}
-                                </button>
+                            <button
+                                type="button"
+                                className="submit-button"
+                                disabled={!conversationId || !storeId || isLoading}
+                                onClick={async () => {
+                                    const success = await handleSubmit(); // 👈 awaits validation + API
+                                    if (success) {
+                                    setSearchParams({ id: conversationId, storeId: storeId }); // 👈 only when valid
+                                    }
+                                }}
+                            >
+                                {isLoading ? 'Loading...' : 'View Conversation'}
+                            </button>
                             </form>
                         )}
 
                         {activeTab === 'date' && (
                             <form className="form-content">
+                                {showError && (
+                                <div style={{ color: 'red', marginBottom: 10 }}>{errorMessage}</div>
+                                )}
                                 <div className="form-group">
                                     <label>Store ID</label>
                                     <input
