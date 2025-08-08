@@ -8,7 +8,7 @@ import 'react-date-range/dist/theme/default.css';
 import { enUS } from 'date-fns/locale';
 import { differenceInDays } from 'date-fns';
 import 'chat-widget';
-
+import { analyzeChatBasic } from '../utils/chatAnalyzer';
 function formatDate(epoch) {
   if (!epoch) return '-';
   const d = new Date(Number(epoch));
@@ -263,6 +263,7 @@ export default function StoreConversationForm() {
     const [isCopiedStoreId, setIsCopiedStoreId] = useState(false);
     const [activeTab, setActiveTab] = useState('conversation');
     const [showError, setShowError] = useState(false);
+    const [intentDetails, setIntentDetails] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
     const [dateRange, setDateRange] = useState([
         {
@@ -301,7 +302,7 @@ useEffect(() => {
   }
 
   window.scrollTo(0, 0);
-}, [searchParams]);
+}, [searchParams,navigate]);
 
 const handleSubmit = async (store = storeId, conversation = conversationId) => {
   if (!store || !conversation) {
@@ -357,6 +358,18 @@ const handleSubmit = async (store = storeId, conversation = conversationId) => {
       userCount: data.userCount,
       conversationCount: data.conversationCount,
     });
+
+const flatMessages = {
+  messages: data.conversation.flatMap(entry =>
+    (entry.messages || []).map(msg => ({
+      sender: msg.isAIReply ? 'Agent' : 'Customer',
+      text: msg.message
+    }))
+  )
+};
+
+const insights = analyzeChatBasic(flatMessages);
+setIntentDetails([insights]);
 
     setShowForm(false);      // Hide form only on success
     setShowError(false);     // Clear any previous error
@@ -818,6 +831,21 @@ const getConversationStats = (messages = []) => {
   }
 }, [showError]);
 
+useEffect(() => {
+  if (activeTab === 'date' && history[currentHistoryIndex]?.conversation) {
+    const flatMessages = {
+      messages: history[currentHistoryIndex].conversation.flatMap(entry =>
+        (entry.messages || []).map(msg => ({
+          sender: msg.isAIReply ? 'Agent' : 'Customer',
+        //   sender: msg.isAIReply ,
+          text: msg.message
+        }))
+    )
+    };
+    const insights = analyzeChatBasic(flatMessages);
+    setIntentDetails([insights]);
+  }
+}, [activeTab, currentHistoryIndex, history]);
 
     return (
         <div>
@@ -1101,6 +1129,44 @@ const getConversationStats = (messages = []) => {
                                         );
                                     })()}
                                 </div>
+                                {intentDetails.length > 0 && (
+                                <div className="id-display-container2"
+                                    style={{
+                                    minWidth: 320,
+                                    maxWidth: 400,
+                                    padding: 16,
+                                    borderRadius: 12,
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                    background: '#fff',
+                                    fontSize: 13,
+                                    marginTop: 8,
+                                    rowGap: 8,
+                                    }}
+                                >
+                                    <h3>Conversation Insights</h3>
+
+                                    {intentDetails.map((item, index) => (
+                                    <div key={index} style={{ marginBottom: 12, borderBottom: '1px solid #eee', paddingBottom: 8 }}>
+                                        <div className="id-display-row">
+                                        <span className="id-label">Intent:</span>
+                                        <span>{item.intent || '-'}</span>
+                                        </div>
+                                        <div className="id-display-row">
+                                        <span className="id-label">Triage Type:</span>
+                                        <span>{item.triage || '-'}</span>
+                                        </div>
+                                        <div className="id-display-row">
+                                        <span className="id-label">Sentiment:</span>
+                                        <span>{item.sentiment || '-'}</span>
+                                        </div>
+                                        <div className="id-display-row">
+                                        <span className="id-label">Summary:</span>
+                                        <span>{item.summary || '-'}</span>
+                                        </div>
+                                    </div>
+                                    ))}
+                                </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -1338,6 +1404,44 @@ const getConversationStats = (messages = []) => {
                                         );
                                     })()}
                                 </div>
+                                {intentDetails.length > 0 && (
+                                <div className="id-display-container2"
+                                    style={{
+                                    minWidth: 320,
+                                    maxWidth: 400,
+                                    padding: 16,
+                                    borderRadius: 12,
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                    background: '#fff',
+                                    fontSize: 13,
+                                    marginTop: 8,
+                                    rowGap: 8,
+                                    }}
+                                >
+                                    <h3>Conversation Insights</h3>
+
+                                    {intentDetails.map((item, index) => (
+                                    <>
+                                        <div className="id-display-row">
+                                        <span className="id-label">Intent:</span>
+                                        <span>{item.intent || '-'}</span>
+                                        </div>
+                                        <div className="id-display-row">
+                                        <span className="id-label">Triage Type:</span>
+                                        <span>{item.triage || '-'}</span>
+                                        </div>
+                                        <div className="id-display-row">
+                                        <span className="id-label">Sentiment:</span>
+                                        <span>{item.sentiment || '-'}</span>
+                                        </div>
+                                        <div className="id-display-row">
+                                        <span className="id-label">Summary:</span>
+                                        <span>{item.summary || '-'}</span>
+                                        </div>
+                                    </>
+                                    ))}
+                                </div>
+                                )}
                             </div>
                         </div>
                     </div>
