@@ -16,7 +16,19 @@ function formatDate(epoch) {
 }
 
 function setupChatWidget(messages, storeId) {
+    const pageInfo= document.querySelector('.askTimmy-current-page-info');
+    if(pageInfo){
+        pageInfo.remove();
+    }
     const chatWidget = document.querySelector('chat-widget');
+    // Delete all props
+    if (chatWidget) {
+        chatWidget.messages = null;
+        chatWidget.storeId = null;
+        chatWidget.styling = null;
+        chatWidget.translation = null;
+    }
+    console.log('chatWidget', chatWidget);
     if (chatWidget) {
         chatWidget.messages = messages;
         chatWidget.storeId = storeId;
@@ -248,6 +260,21 @@ function setupChatWidget(messages, storeId) {
             "moneyWithCurrencyFormat": "${{amount}} USD",
             "moneyWithCurrencyInEmailsFormat": "${{amount}} USD"
         };
+            const title= messages[0]?.title;
+            const currentPageUrl = messages[0]?.currentPageUrl;
+            if (currentPageUrl && title) {
+                // Remove existing current page info div if it exists
+                const existingDiv = chatWidget.querySelector('.askTimmy-chat-assistant-info');
+                
+                // Create new current page info div
+                const currentPageDiv = document.createElement('div');
+                currentPageDiv.className = 'askTimmy-current-page-info';
+                currentPageDiv.innerHTML = `<span class="front-line line"></span><span class="info"><a href="${currentPageUrl}" style="color: #333333; text-decoration: none;" target="_blank">Now you are on ${title} page</a></span><span class="end-line line"></span>`;
+                if(existingDiv){
+                    existingDiv.insertAdjacentElement('afterend', currentPageDiv);
+                }
+            }
+        
         window.scrollTo(0, 0);
     }
 }
@@ -319,7 +346,9 @@ export default function StoreConversationForm() {
                         isUninstalled: data.isUninstalled,
                         aiCount: data.aiCount,
                         userCount: data.userCount,
-                        conversationCount: data.conversationCount
+                        conversationCount: data.conversationCount,
+                        createdAt: data.createdAt,
+                        updatedAt: data.updatedAt
                     });
                     setShowForm(false);
                 } catch (error) {
@@ -772,6 +801,7 @@ export default function StoreConversationForm() {
     };
 
     const extractMessages = (data, tab) => {
+        console.log('data', data);
         if (tab === 'conversation') {
             return Array.isArray(data?.conversation)
                 ? data.conversation
@@ -1072,6 +1102,14 @@ export default function StoreConversationForm() {
                                                     <span className="id-label">Total Messages:</span>
                                                     <span>{conversationCount || 0}</span>
                                                 </div>
+                                                <div className="id-display-row">
+                                                    <span className="id-label">Created At:</span>
+                                                    <span>{formatDate(responseData.createdAt)}</span>
+                                                </div>
+                                                <div className="id-display-row">
+                                                    <span className="id-label">Updated At:</span>
+                                                    <span>{formatDate(responseData.updatedAt)}</span>
+                                                </div>
                                             </>
                                         );
                                     })()}
@@ -1287,7 +1325,8 @@ export default function StoreConversationForm() {
                                     }}>
                                     <h3>Conversation Summary</h3>
                                     {(() => {
-                                        const { userCount, aiCount, conversationCount } = history[currentHistoryIndex] || {};
+                                        console.log("history[currentHistoryIndex]:", history[currentHistoryIndex]);
+                                        const { userCount, aiCount, conversationCount, createdAt, updatedAt } = history[currentHistoryIndex] || {};
                                         return (
                                             <>
                                                 <div className="id-display-row">
@@ -1309,6 +1348,8 @@ export default function StoreConversationForm() {
                                                 </div>
                                                 <div className="id-display-row"><span className="id-label">AI Replies:</span> <span>{aiCount || 0}</span></div>
                                                 <div className="id-display-row"><span className="id-label">Total Messages:</span> <span>{conversationCount || 0}</span></div>
+                                                <div className="id-display-row"><span className="id-label">Created At:</span> <span>{formatDate(createdAt)}</span></div>
+                                                <div className="id-display-row"><span className="id-label">Updated At:</span> <span>{formatDate(updatedAt)}</span></div>
                                             </>
                                         );
                                     })()}
