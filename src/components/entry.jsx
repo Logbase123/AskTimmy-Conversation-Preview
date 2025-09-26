@@ -265,6 +265,7 @@ function setupChatWidget(messages, storeId) {
             const currentPageDiv = document.createElement('div');
             currentPageDiv.className = 'askTimmy-current-page-info';
             currentPageDiv.innerHTML = `<span class="front-line line"></span><span class="info"><a href="${currentPageUrl}" style="color: #333333; text-decoration: none;" target="_blank">Now you are on ${title} page</a></span><span class="end-line line"></span>`;
+            console.log(existingDiv, currentPageDiv, title)
             if (existingDiv) {
                 existingDiv.insertAdjacentElement('afterend', currentPageDiv);
             }
