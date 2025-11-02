@@ -32,8 +32,10 @@ function setupChatWidget(messages, storeId) {
 
     
     // Find the container and append the new chat widget
-    const container = document.querySelector('.chat-history');
-    container.appendChild(chatWidget);
+    const container = document.querySelector('.chat-history')
+    if (container) {
+        container.appendChild(chatWidget);
+    }
     
     if (chatWidget) {
         chatWidget.isAIShoppingPageEnabled = false;
