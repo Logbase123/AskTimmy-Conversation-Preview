@@ -20,14 +20,23 @@ function setupChatWidget(messages, storeId) {
     if (pageInfo) {
         pageInfo.remove();
     }
-    const chatWidget = document.querySelector('chat-widget');
-    if (chatWidget) {
-        chatWidget.messages = null;
-        chatWidget.storeId = null;
-        chatWidget.styling = null;
-        chatWidget.translation = null;
+    const existingChatWidget = document.querySelector('chat-widget');
+    if (existingChatWidget) {
+        existingChatWidget.remove();
     }
+    
+    // Create a new chat widget element
+    const chatWidget = document.createElement('chat-widget');
+    // chatWidget.className = 'chat-widget-container';
+    chatWidget.classList.add('chat-widget-container');
+
+    
+    // Find the container and append the new chat widget
+    const container = document.querySelector('.chat-history');
+    container.appendChild(chatWidget);
+    
     if (chatWidget) {
+        chatWidget.isAIShoppingPageEnabled = false;
         chatWidget.messages = messages;
         chatWidget.storeId = storeId;
         chatWidget.styling = {
