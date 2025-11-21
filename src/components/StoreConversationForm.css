@@ -484,3 +484,8 @@
 }
 
 
+@media (max-width: 600px) {
+  .chat-history{
+    min-width: 90vw !important;
+  }
+}
