@@ -884,12 +884,21 @@ export default function StoreConversationForm() {
                                                     <span>{formatDate(responseData.updatedAt)}</span>
                                                 </div>
                                                 <div className="id-display-row">
-                                                    <span className="id-label"> Type</span>
+                                                    <span className="id-label"> Type:</span>
                                                     <span>{responseData?.traceId ? "Agents" : "Response"} </span>
                                                 </div>
                                                 <div className="id-display-row">
                                                     <span className="id-label">{responseData?.traceId ? "TraceID:" : "ConvoID:"}</span>
                                                     <span style={{ wordBreak: 'break-all', flex: 1 }}>{responseData?.traceId ? responseData.traceId : responseData?.convoID ? responseData?.convoID : responseData.id}</span>
+                                                    <button className="copy-button" onClick={() => {
+                                                        if (conversationId) {
+                                                            navigator.clipboard.writeText(conversationId);
+                                                            setIsCopiedId(true);
+                                                            setTimeout(() => setIsCopiedId(false), 2000);
+                                                        }
+                                                    }}>
+                                                        <img src={isCopiedId ? checkCircle : copy} alt="Copy" className="copy-icon" />
+                                                    </button>
                                                 </div>
                                             </>
                                         );
@@ -1132,12 +1141,21 @@ export default function StoreConversationForm() {
                                                 <div className="id-display-row"><span className="id-label">Created At:</span> <span>{formatDate(createdAt)}</span></div>
                                                 <div className="id-display-row"><span className="id-label">Updated At:</span> <span>{formatDate(updatedAt)}</span></div>
                                                 <div className="id-display-row">
-                                                    <span className="id-label"> Type</span>
+                                                    <span className="id-label"> Type:</span>
                                                     <span>{responseData?.traceId ? "Agents" : "Response"} </span>
                                                 </div>
                                                 <div className="id-display-row">
-                                                    <span className="id-label">{responseData?.traceId ? "TraceID" : "ConvoID"}</span>
-                                                    <span>{responseData?.traceId ? responseData.traceId : responseData?.convoID ? responseData?.convoID : responseData.id}</span>
+                                                    <span className="id-label">{responseData?.traceId ? "TraceID:" : "ConvoID:"}</span>
+                                                    <span style={{ wordBreak: 'break-all', flex: 1 }}>{responseData?.traceId ? responseData.traceId : responseData?.convoID ? responseData?.convoID : responseData.id}</span>
+                                                    <button className="copy-button" onClick={() => {
+                                                        if (conversationId) {
+                                                            navigator.clipboard.writeText(conversationId);
+                                                            setIsCopiedId(true);
+                                                            setTimeout(() => setIsCopiedId(false), 2000);
+                                                        }
+                                                    }}>
+                                                        <img src={isCopiedId ? checkCircle : copy} alt="Copy" className="copy-icon" />
+                                                    </button>
                                                 </div>
                                             </>
                                         );
