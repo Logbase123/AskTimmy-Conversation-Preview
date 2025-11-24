@@ -24,19 +24,19 @@ function setupChatWidget(messages, storeId) {
     if (existingChatWidget) {
         existingChatWidget.remove();
     }
-    
+
     // Create a new chat widget element
     const chatWidget = document.createElement('chat-widget');
     // chatWidget.className = 'chat-widget-container';
     chatWidget.classList.add('chat-widget-container');
 
-    
+
     // Find the container and append the new chat widget
     const container = document.querySelector('.chat-history')
     if (container) {
         container.appendChild(chatWidget);
     }
-    
+
     if (chatWidget) {
         chatWidget.isAIShoppingPageEnabled = false;
         chatWidget.messages = messages;
@@ -880,6 +880,14 @@ export default function StoreConversationForm() {
                                                     <span className="id-label">Updated At:</span>
                                                     <span>{formatDate(responseData.updatedAt)}</span>
                                                 </div>
+                                                <div className="id-display-row">
+                                                    <span className="id-label"> Type</span>
+                                                    <span>{responseData?.traceId ? "Agents" : "Response"} </span>
+                                                </div>
+                                                <div className="id-display-row">
+                                                    <span className="id-label">{responseData?.traceId ? "TraceID" : "ConvoID"}</span>
+                                                    <span>{responseData?.traceId ? responseData.traceId : responseData?.convoID ? responseData?.convoID : responseData.id}</span>
+                                                </div>
                                             </>
                                         );
                                     })()}
@@ -1120,6 +1128,14 @@ export default function StoreConversationForm() {
                                                 <div className="id-display-row"><span className="id-label">Total Messages:</span> <span>{conversationCount || 0}</span></div>
                                                 <div className="id-display-row"><span className="id-label">Created At:</span> <span>{formatDate(createdAt)}</span></div>
                                                 <div className="id-display-row"><span className="id-label">Updated At:</span> <span>{formatDate(updatedAt)}</span></div>
+                                                <div className="id-display-row">
+                                                    <span className="id-label"> Type</span>
+                                                    <span>{responseData?.traceId ? "Agents" : "Response"} </span>
+                                                </div>
+                                                <div className="id-display-row">
+                                                    <span className="id-label">{responseData?.traceId ? "TraceID" : "ConvoID"}</span>
+                                                    <span>{responseData?.traceId ? responseData.traceId : responseData?.convoID ? responseData?.convoID : responseData.id}</span>
+                                                </div>
                                             </>
                                         );
                                     })()}
