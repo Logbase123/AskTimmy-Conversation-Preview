@@ -1142,7 +1142,7 @@ export default function StoreConversationForm() {
                                                 <div className="id-display-row"><span className="id-label">Updated At:</span> <span>{formatDate(updatedAt)}</span></div>
                                                 <div className="id-display-row">
                                                     <span className="id-label"> Type:</span>
-                                                    <span>{responseData?.traceId ? "Agents" : "Response"} </span>
+                                                    <span>{traceId ? "Agents" : "Response"} </span>
                                                 </div>
                                                 <div className="id-display-row">
                                                     <span className="id-label">{traceId ? "TraceID:" : "ConvoID:"}</span>
