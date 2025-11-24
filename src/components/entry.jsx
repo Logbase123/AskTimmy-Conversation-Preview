@@ -358,7 +358,7 @@ export default function StoreConversationForm() {
                         conversationCount: data.conversationCount,
                         createdAt: data.createdAt,
                         updatedAt: data.updatedAt,
-                        convoID: data?.convoID,
+                        convoID: data?.convoId,
                         traceId: data.traceId,
                         id: data?.id
                     });
