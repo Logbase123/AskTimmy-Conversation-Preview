@@ -1116,7 +1116,7 @@ export default function StoreConversationForm() {
                                     <h3>Conversation Summary</h3>
                                     {(() => {
                                         console.log("history[currentHistoryIndex]:", history[currentHistoryIndex]);
-                                        const { userCount, aiCount, conversationCount, createdAt, updatedAt } = history[currentHistoryIndex] || {};
+                                        const { userCount, aiCount, conversationCount, createdAt, updatedAt, convoId, traceId } = history[currentHistoryIndex] || {};
                                         return (
                                             <>
                                                 <div className="id-display-row">
@@ -1145,8 +1145,8 @@ export default function StoreConversationForm() {
                                                     <span>{responseData?.traceId ? "Agents" : "Response"} </span>
                                                 </div>
                                                 <div className="id-display-row">
-                                                    <span className="id-label">{responseData?.traceId ? "TraceID:" : "ConvoID:"}</span>
-                                                    <span style={{ wordBreak: 'break-all', flex: 1 }}>{responseData?.traceId ? responseData.traceId : responseData?.convoID ? responseData?.convoID : responseData.id}</span>
+                                                    <span className="id-label">{traceId ? "TraceID:" : "ConvoID:"}</span>
+                                                    <span style={{ wordBreak: 'break-all', flex: 1 }}>{traceId ? traceId : convoId ? convoId : ''}</span>
                                                     <button className="copy-button" onClick={() => {
                                                         if (conversationId) {
                                                             navigator.clipboard.writeText(conversationId);
