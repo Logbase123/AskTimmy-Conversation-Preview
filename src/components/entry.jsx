@@ -357,7 +357,10 @@ export default function StoreConversationForm() {
                         userCount: data.userCount,
                         conversationCount: data.conversationCount,
                         createdAt: data.createdAt,
-                        updatedAt: data.updatedAt
+                        updatedAt: data.updatedAt,
+                        convoID: data?.convoID,
+                        traceId: data.traceId,
+                        id: data?.id
                     });
                     setShowForm(false);
                 } catch (error) {
