@@ -444,7 +444,7 @@ export default function StoreConversationForm() {
 
         try {
             const response = await fetch(
-                `https://chateasy-test.logbase.io/api/conversation?storeId=${storeId}&startDate=${startEpoch}&endDate=${endEpoch}&limit=500`
+                `https://chateasy.logbase.io/api/conversation?storeId=${storeId}&startDate=${startEpoch}&endDate=${endEpoch}&limit=500`
             );
 
             const text = await response.text();
